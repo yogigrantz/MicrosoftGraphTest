@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/EmailConceptG/bin/Debug/net6.0
+/EmailConceptG/obj
+/.vs/EmailConceptG/v17
+/.vs/EmailConceptG/FileContentIndex
