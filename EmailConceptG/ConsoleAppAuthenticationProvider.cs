@@ -12,33 +12,33 @@ public class ConsoleAppAuthenticationProvider : IAuthenticationProvider
     private string _cachefileName;
     private string[] _scopes;
 
-    private string accessToken = null;
-    private NetworkCredential nc = null;
-    private IPublicClientApplication app = null;
+    private string _accessToken = null;
+    private NetworkCredential _nc = null;
+    private IPublicClientApplication _app = null;
 
     public ConsoleAppAuthenticationProvider(OAuth2DTO oauth2, string cacheFileName, string[] scopes)
     {
         _scopes = scopes;
         _cachefileName = cacheFileName;
-        app = PublicClientApplicationBuilder
+        _app = PublicClientApplicationBuilder
                                          .Create(oauth2.ClientId)
                                          .WithTenantId(oauth2.TenantId)
                                          .Build();
-        nc = new NetworkCredential(oauth2.UserName, oauth2.Password);
+        _nc = new NetworkCredential(oauth2.UserName, oauth2.Password);
     }
 
     public  Task AuthenticateRequestAsync(RequestInformation request, Dictionary<string, object>? additionalAuthenticationContext = null, CancellationToken cancellationToken = default)
     {
-        if (this.accessToken == null)
-            this.accessToken = GetCachedToken(nc.UserName);
+        if (this._accessToken == null)
+            this._accessToken = GetCachedToken(_nc.UserName);
 
-        if (this.accessToken == null || this.accessToken.StartsWith("AuthError"))
+        if (this._accessToken == null || this._accessToken.StartsWith("AuthError"))
         {
             try
             {
-                AuthenticationResult? tokenResult = app.AcquireTokenByUsernamePassword(_scopes, nc.UserName, nc.SecurePassword).ExecuteAsync().Result;
-                this.accessToken = tokenResult.AccessToken;
-                SetCachedToken(nc.UserName, this.accessToken);
+                AuthenticationResult? tokenResult = _app.AcquireTokenByUsernamePassword(_scopes, _nc.UserName, _nc.SecurePassword).ExecuteAsync().Result;
+                this._accessToken = tokenResult.AccessToken;
+                SetCachedToken(_nc.UserName, this._accessToken);
             }
             catch (AggregateException ex)
             {
@@ -54,14 +54,14 @@ public class ConsoleAppAuthenticationProvider : IAuthenticationProvider
         {
             if (!request.Headers.TryGetValue("Authorization", out var auth))
             {
-                if (this.accessToken != null && !this.accessToken.StartsWith("AuthError"))
-                    request.Headers.Add("Authorization", "Bearer " + this.accessToken);
+                if (this._accessToken != null && !this._accessToken.StartsWith("AuthError"))
+                    request.Headers.Add("Authorization", "Bearer " + this._accessToken);
             }
         }
         catch (Exception)
         {
-            if (this.accessToken != null && !this.accessToken.StartsWith("AuthError"))
-                request.Headers.Add("Authorization", "Bearer " + this.accessToken);
+            if (this._accessToken != null && !this._accessToken.StartsWith("AuthError"))
+                request.Headers.Add("Authorization", "Bearer " + this._accessToken);
         }
 
         return Task.CompletedTask;
