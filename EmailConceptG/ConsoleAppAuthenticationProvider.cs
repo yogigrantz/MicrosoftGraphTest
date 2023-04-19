@@ -10,14 +10,15 @@ namespace EmailConceptG;
 public class ConsoleAppAuthenticationProvider : IAuthenticationProvider
 {
     private string _cachefileName;
-    private string[] scopes = new string[] { "Mail.Send", "SMTP.Send" };
+    private string[] _scopes;
 
     private string accessToken = null;
     private NetworkCredential nc = null;
     private IPublicClientApplication app = null;
 
-    public ConsoleAppAuthenticationProvider(OAuth2DTO oauth2, string cacheFileName)
+    public ConsoleAppAuthenticationProvider(OAuth2DTO oauth2, string cacheFileName, string[] scopes)
     {
+        _scopes = scopes;
         _cachefileName = cacheFileName;
         app = PublicClientApplicationBuilder
                                          .Create(oauth2.ClientId)
@@ -35,7 +36,7 @@ public class ConsoleAppAuthenticationProvider : IAuthenticationProvider
         {
             try
             {
-                AuthenticationResult? tokenResult = app.AcquireTokenByUsernamePassword(scopes, nc.UserName, nc.SecurePassword).ExecuteAsync().Result;
+                AuthenticationResult? tokenResult = app.AcquireTokenByUsernamePassword(_scopes, nc.UserName, nc.SecurePassword).ExecuteAsync().Result;
                 this.accessToken = tokenResult.AccessToken;
                 SetCachedToken(nc.UserName, this.accessToken);
             }
