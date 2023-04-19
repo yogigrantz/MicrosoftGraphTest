@@ -17,7 +17,7 @@ IAuthenticationProvider cap = new ConsoleAppAuthenticationProvider(new OAuth2DTO
     TenantId = "*****",
     UserName = emailUsername,
     Password = "*****"
-}, @"C:\Temp\GraphCache.txt");
+}, @"C:\Temp\GraphCache.txt", new[] { "Mail.ReadWrite", "Mail.Send", "SMTP.Send" });
 
 // Pass auth provider to the new instance of graphClient
 GraphServiceClient graphClient = new GraphServiceClient(cap);
